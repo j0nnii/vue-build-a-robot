@@ -8,15 +8,26 @@
 </template>
 
 <script>
+import parts from '../data/parts';
+
 export default {
   name: 'PartInfo',
-  data() {
-    return {
-      part: {
+  props: {
+    partType: { type: String },
+    id: { type: [Number, String] },
+    validator(value) {
+      return Number.isInteger(Number(value));
+    }
+  },
+  computed: {
+    part() {
+      const { partType, id } = this;
+      return parts[partType].find(part => part.id === id);
+      return {
         title: 'Part title',
         description: 'Part Description'
       }
-    };
+    }
   }
 };
 </script>

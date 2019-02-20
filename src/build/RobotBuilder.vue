@@ -3,19 +3,19 @@
     <div class="content">
       <div class="preview">
         <CollapsibleSection>
-        <div class="preview-content">
-          <div class="top-row">
-            <img :src="selectedRobot.head.src" />
+          <div class="preview-content">
+            <div class="top-row">
+              <img :src="selectedRobot.head.src" />
+            </div>
+            <div class="middle-row">
+              <img :src="selectedRobot.leftArm.src" class="rotate-left" />
+              <img :src="selectedRobot.torso.src" />
+              <img :src="selectedRobot.rightArm.src" class="rotate-right" />
+            </div>
+            <div class="bottom-row">
+              <img :src="selectedRobot.base.src" />
+            </div>
           </div>
-          <div class="middle-row">
-            <img :src="selectedRobot.leftArm.src" class="rotate-left" />
-            <img :src="selectedRobot.torso.src" />
-            <img :src="selectedRobot.rightArm.src" class="rotate-right" />
-          </div>
-          <div class="bottom-row">
-            <img :src="selectedRobot.base.src" />
-          </div>
-        </div>
         </CollapsibleSection>
         <button class="add-to-cart" @click="addToCart()">
           Add to cart
@@ -81,15 +81,26 @@
 import availableParts from "../data/parts";
 import createdHookMixin from "./created-hook-mixin";
 import PartSelector from "./PartSelector.vue";
-import CollapsibleSection from '../shared/CollapsibleSection.vue';
+import CollapsibleSection from "../shared/CollapsibleSection.vue";
 
 export default {
   name: "RobotBuilder",
   mixins: [createdHookMixin],
+  beforeRouteLeave(to, from, next) {
+    if (this.addedToCart) {
+      next(true);
+    } else {
+      const response = confirm(
+        'you have not added your robot to your cart, are you sure you want to leave?'
+      );
+      next(response);
+    }
+  },
   components: { PartSelector, CollapsibleSection },
   data() {
     return {
       availableParts,
+      addedToCart: false,
       cart: [],
       selectedRobot: {
         head: {},
@@ -115,6 +126,7 @@ export default {
         robot.rightArm.cost +
         robot.base.cost;
       this.cart.push(Object.assign({}, robot, { cost }));
+      this.addedToCart = true;
     }
   }
 };
